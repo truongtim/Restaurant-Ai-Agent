@@ -1,58 +1,32 @@
-# 🍽️ Secure Multi-Agent Restaurant Intelligence System
+# Secure Multi-Agent Restaurant Intelligence System
 
-A multi-agent AI pipeline that analyzes restaurant reviews and computes quality scores, built with AutoGen and OpenAI. Developed for CSCI 5240 - Generative AI.
+A multi-agent AI pipeline that analyzes restaurant reviews and computes an overall quality score on a 0-10 scale. Built using Microsoft AutoGen and OpenAI GPT-4o-mini for CSCI 5240 - Generative AI.
 
----
+## Overview
 
-## 📋 Overview
+This system processes a natural language restaurant query through a sequential pipeline of four specialized AI agents. Each agent has a distinct role and passes its output to the next agent in the chain. The pipeline also includes LLM security features to detect and block adversarial prompt injection attacks.
 
-This system uses four AI agents working together in a pipeline to:
-1. Validate incoming queries for security threats
-2. Fetch restaurant reviews from a dataset
-3. Analyze each review and extract food and service scores
-4. Compute a final weighted score for the restaurant
-
----
-
-## 🏗️ System Architecture
+## Pipeline Architecture
 
 ```
 User Query
-    ↓
-Security Agent      → Checks if query is safe or adversarial
-    ↓
-Data Fetch Agent    → Retrieves all reviews for the restaurant
-    ↓
-Review Analysis Agent → Scores each review (food + customer service)
-    ↓
-Scoring Agent       → Computes final weighted score (0-10)
+    |
+Security Agent        - Validates the query for adversarial content
+    |
+Data Fetch Agent      - Retrieves all reviews for the restaurant from the dataset
+    |
+Review Analysis Agent - Extracts food and customer service scores from each review
+    |
+Scoring Agent         - Computes the final weighted score using a mathematical formula
 ```
 
----
+## Agents
 
-## 🤖 Agents
+**Security Agent** - Inspects the incoming query and outputs either SAFE or BLOCKED. If blocked, the pipeline halts immediately.
 
-| Agent | Role |
-|-------|------|
-| **Security Agent** | Inspects queries for prompt injection or adversarial content. Outputs `SAFE: <query>` or `BLOCKED: <reason>` |
-| **Data Fetch Agent** | Calls `fetch_restaurant_data()` to retrieve reviews from the dataset |
-| **Review Analysis Agent** | Maps keywords to scores (1-5) for food and customer service |
-| **Scoring Agent** | Calls `calculate_overall_score()` to compute the final score |
+**Data Fetch Agent** - Calls fetch_restaurant_data() to retrieve all reviews for the queried restaurant from restaurant-data.txt.
 
----
-
-## 📊 Scoring Formula
-
-$$\text{score} = \frac{10}{N \cdot \sqrt{125}} \sum_{i=1}^{N} \sqrt{f_i^2 \cdot c_i}$$
-
-Where:
-- $f_i$ = food score for review $i$
-- $c_i$ = customer service score for review $i$
-- $N$ = total number of reviews
-
----
-
-## 🔑 Keyword Scoring
+**Review Analysis Agent** - Scans each review for scoring keywords and assigns a food score and customer service score (1-5) per review based on the following table:
 
 | Score | Keywords |
 |-------|----------|
@@ -62,91 +36,62 @@ Where:
 | 4 | good, enjoyable, satisfying |
 | 5 | awesome, incredible, amazing |
 
----
+**Scoring Agent** - Calls calculate_overall_score() using the extracted scores to produce a final score.
 
-## 🔒 Security Features
+## Scoring Formula
 
-- **Security Agent** blocks adversarial queries before they enter the pipeline
-- **Defense prompt** prevents secret key leakage from LLM systems
-- Handles prompt injection, virtualization, and obfuscation attacks
+```
+score = (10 / (N * sqrt(125))) * SUM( sqrt(food[i]^2 * service[i]) )
+```
 
----
+Where food[i] and service[i] are the scores for review i, and N is the total number of reviews.
 
-## 🚀 Setup & Installation
-
-### Prerequisites
-- Python 3.11+
-- OpenAI API key with credits
-
-### Installation
+## Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/YOUR-USERNAME/restaurant-ai-agent.git
-cd restaurant-ai-agent
-
 # Create and activate virtual environment
 python -m venv venv
-venv\Scripts\activate  # Windows
-source venv/bin/activate  # Mac/Linux
+venv\Scripts\activate
 
 # Install dependencies
 pip install pyautogen openai
 
-# Set your OpenAI API key
-$env:OPENAI_API_KEY="sk-your-key-here"  # Windows PowerShell
-export OPENAI_API_KEY="sk-your-key-here"  # Mac/Linux
+# Set OpenAI API key
+$env:OPENAI_API_KEY="your-key-here"
 ```
 
----
-
-## 💻 Usage
+## Usage
 
 ```bash
 python Student.py "How good is Subway?"
 python Student.py "What is the overall score for Taco Bell?"
-python Student.py "How good is Krispy Kreme?"
 ```
 
-### Example Output
-```
-The final overall score for Subway is 7.066.
-```
-
----
-
-## 🧪 Testing
+## Testing
 
 ```bash
 python test.py
 ```
 
----
-
-## 📁 File Structure
+## File Structure
 
 ```
 Assignment1/
-├── Student.py          # Main implementation
-├── restaurant-data.txt # Dataset of restaurant reviews
-├── attack-1.txt        # Basic prompt injection attack
-├── attack-2.txt        # Sophisticated prompt injection attack
-├── defense.txt         # Defense prompt + Security Agent prompt
-├── test.py             # Public test script
-└── requirements.txt    # Dependencies
+├── Student.py           - Main implementation
+├── restaurant-data.txt  - Dataset of restaurant reviews
+├── attack-1.txt         - Basic prompt injection attack prompt
+├── attack-2.txt         - Sophisticated prompt injection attack prompt
+├── defense.txt          - Defense prompt and Security Agent system message
+├── test.py              - Public test script
+└── requirements.txt     - Dependencies
 ```
 
----
+## Built With
 
-## 🛠️ Built With
-
-- [AutoGen](https://github.com/microsoft/autogen) - Multi-agent orchestration framework
-- [OpenAI GPT-4o-mini](https://openai.com) - Language model
+- AutoGen - Multi-agent orchestration framework
+- OpenAI GPT-4o-mini - Large language model
 - Python 3.11
 
----
+## Author
 
-## 👤 Author
-
-**Tim Truong**  
-CSCI 5240 - Generative AI
+Tim Truong - CSCI 5240 Generative AI
